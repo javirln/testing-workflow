@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  onboard_workflow:
+    name: Onboard Chainloop Workflow
+    uses: chainloop-dev/labs/.github/workflows/chainloop_github_release.yml@fe6a2afb097cc05bc5812e777aef46316a54ae2c
+    with:
+      project: "chainloop"
+      workflow_name: "chainloop-vault-release"
+      additional_materials: "ghcr.io/chainloop-dev/chainloop/control-plane:${{ github.ref }},ghcr.io/chainloop-dev/chainloop/artifact-cas:${{ github.ref }},ghcr.io/chainloop-dev/chainloop/cli:${{ github.ref }}"
+    secrets:
+      api_token: ${{ secrets.CHAINLOOP_API_TOKEN }}
+      cosign_key: ${{ secrets.COSIGN_KEY }}
+      cosign_password: ${{ secrets.COSIGN_PASSWORD }}
