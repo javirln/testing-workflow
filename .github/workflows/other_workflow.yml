@@ -1,18 +1,39 @@
 name: Other Release workflow
 
 on:
-  release:
-    types: [published]
+  pull_request:
 
 jobs:
-  onboard_workflow:
-    name: Onboard Chainloop Workflow
-    uses: chainloop-dev/labs/.github/workflows/chainloop_github_release.yml@2c2fd4a5dbe0ad8020d0550c3f9c52d864b2cd12
-    with:
-      project: "chainloop"
-      workflow_name: "chainloop-vault-release"
-      additional_materials: "ghcr.io/chainloop-dev/chainloop/control-plane:${{ github.ref_name }},ghcr.io/chainloop-dev/chainloop/artifact-cas:${{ github.ref_name }},ghcr.io/chainloop-dev/chainloop/cli:${{ github.ref_name }}"
-    secrets:
-      api_token: ${{ secrets.CHAINLOOP_API_TOKEN }}
-      cosign_key: ${{ secrets.COSIGN_KEY }}
-      cosign_password: ${{ secrets.COSIGN_PASSWORD }}
+  
+  first_one:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Docker login to Github Packages
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run a one-line script
+        run: |
+          images=$(cat artifact.json | jq -r '.[] | select(.type=="Docker Image" or .type=="Docker Manifest") | .path')
+          for entry in $images; do
+            # exclude latest tag
+            if [[ $entry != *latest ]]; then
+              # Extract only the image name and the architecture on the tag
+              repo="${entry%:*}"                    # Remove tag
+              repo="${repo##*/}"                    # Extract last segment after the last '/'
+              material_name="${repo}-${entry##*-}"  # Construct final name
+
+
+              # Material name is the name of the image
+              echo "Material name: $material_name"
+              # Tag is the tag of the image
+              echo "Tag: $entry"
+            fi
+          done
+
