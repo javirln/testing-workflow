@@ -29,6 +29,14 @@ jobs:
         run: |
           # Install Syft
           wget --no-verbose https://raw.githubusercontent.com/anchore/syft/c43f4fb416c34c1c4b3997373689d8d4c0fb9b36/install.sh -O - | sh -s -- -b /usr/local/bin
+      
+      - name: Initialize Attestation
+        run: |
+          chainloop attestation init --workflow ${CHAINLOOP_WORKFLOW_NAME} --project ${CHAINLOOP_PROJECT_NAME}
+        env:
+          CHAINLOOP_TOKEN: ${{ secrets.CHAINLOOP_TOKEN }}
+          CHAINLOOP_WORKFLOW_NAME: "release"
+          CHAINLOOP_PROJECT_NAME: "core"
 
       - name: Run a one-line script
         run: |
@@ -49,6 +57,14 @@ jobs:
               echo "Material name: $material_name"
               # Tag is the tag of the image
               echo "Tag: $entry"
+
+              syft -o cyclonedx-json=/tmp/sbom-$material_name.cyclonedx.json $entry
+              echo "chainloop attestation add --value $entry"
+              chainloop --debug attestation add --value $entry
+              echo "chainloop attestation add --value /tmp/sbom-$material_name.cyclonedx.json"
+              chainloop --debug attestation add --value /tmp/sbom-$material_name.cyclonedx.json
             fi
+
+            chainloop attestation push
           done
 
