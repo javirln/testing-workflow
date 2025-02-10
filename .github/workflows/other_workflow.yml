@@ -46,7 +46,7 @@ jobs:
           for entry in $images; do
             # exclude latest tag
             if [[ $entry != *latest ]]; then
-              material_name="${$entry | sed 's#.*/##'}"
+              material_name="$($entry | sed 's#.*/##')"
 
               syft -o cyclonedx-json=/tmp/sbom-$material_name.cyclonedx.json $entry
               ls -lh /tmp
