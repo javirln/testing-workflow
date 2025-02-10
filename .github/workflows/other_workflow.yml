@@ -2,6 +2,9 @@ name: Other Release workflow
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   
