@@ -21,6 +21,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install Chainloop
+        run: |
+          curl -sfL https://docs.chainloop.dev/install.sh | bash -s
+
+      - name: Install Syft
+        run: |
+          # Install Syft
+          wget --no-verbose https://raw.githubusercontent.com/anchore/syft/c43f4fb416c34c1c4b3997373689d8d4c0fb9b36/install.sh -O - | sh -s -- -b /usr/local/bin
+
       - name: Run a one-line script
         run: |
           images=$(cat .github/workflows/artifact.json | jq -r '.[] | select(.type=="Docker Image" or .type=="Docker Manifest") | .path')
@@ -32,6 +41,9 @@ jobs:
               repo="${repo##*/}"                    # Extract last segment after the last '/'
               material_name="${repo}-${entry##*-}"  # Construct final name
 
+
+              syft -o cyclonedx-json=/tmp/sbom-$material_name.cyclonedx.json $entry
+              ls -l /tmp
 
               # Material name is the name of the image
               echo "Material name: $material_name"
