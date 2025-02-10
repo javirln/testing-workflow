@@ -46,11 +46,7 @@ jobs:
           for entry in $images; do
             # exclude latest tag
             if [[ $entry != *latest ]]; then
-              # Extract only the image name and the architecture on the tag
-              repo="${entry%:*}"                    # Remove tag
-              repo="${repo##*/}"                    # Extract last segment after the last '/'
-              material_name="${repo}-${entry##*-}"  # Construct final name
-
+              material_name="echo $entry | sed 's#.*/##'"
 
               syft -o cyclonedx-json=/tmp/sbom-$material_name.cyclonedx.json $entry
               ls -lh /tmp
