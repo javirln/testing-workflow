@@ -23,7 +23,7 @@ jobs:
 
       - name: Run a one-line script
         run: |
-          images=$(cat artifact.json | jq -r '.[] | select(.type=="Docker Image" or .type=="Docker Manifest") | .path')
+          images=$(cat .github/workflows/artifact.json | jq -r '.[] | select(.type=="Docker Image" or .type=="Docker Manifest") | .path')
           for entry in $images; do
             # exclude latest tag
             if [[ $entry != *latest ]]; then
