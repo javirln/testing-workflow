@@ -53,7 +53,7 @@ jobs:
 
 
               syft -o cyclonedx-json=/tmp/sbom-$material_name.cyclonedx.json $entry
-              ls -l /tmp
+              ls -lh /tmp
 
               # Material name is the name of the image
               echo "Material name: $material_name"
